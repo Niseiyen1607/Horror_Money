@@ -16,11 +16,13 @@ public class StealthEnemy : MonoBehaviour
     private float enemyFootstepTimer = 0f;
     [SerializeField] private float footstepInterval = 0.2f;
     [SerializeField] private float distanceMaxVolume = 50f;
+    [SerializeField] private float distancePhase2Scream = 50f;
 
     [Header("Movement Settings")]
     public float idleSpeed = 0f;
     public float sneakSpeed = 2f;
     public float chaseSpeed = 10f;
+    public float phase2ChaseSpeed = 50f;
 
     private float currentSpeed = 0f;
 
@@ -34,13 +36,17 @@ public class StealthEnemy : MonoBehaviour
 
     private bool isStunned = false;
     private float stunTimer = 0f;
-    public float stunDuration = 1f;
+    public float stunDuration = 5f;
+
+    public enum EnemyPhase { Phase1, Phase2 }
+    public EnemyPhase currentPhase = EnemyPhase.Phase1;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         InvokeRepeating(nameof(CheckVisibilityAndLineOfSight), 0f, visionCheckInterval);
         playerHealth = player.GetComponent<PlayerHealth>();
+        GameManager.Instance.OnPhaseChanged += HandlePhaseChange;
     }
 
     void Update()
@@ -48,7 +54,8 @@ public class StealthEnemy : MonoBehaviour
         if (isStunned)
         {
             stunTimer -= Time.deltaTime;
-            agent.isStopped = true;  
+            agent.isStopped = true;
+
             if (stunTimer <= 0f)
             {
                 isStunned = false;
@@ -56,7 +63,7 @@ public class StealthEnemy : MonoBehaviour
             }
             else
             {
-                return; 
+                return;
             }
         }
         else
@@ -102,15 +109,12 @@ public class StealthEnemy : MonoBehaviour
             if (damageTimer >= damageInterval)
             {
                 damageTimer = 0f;
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(damageAmount);
-                    CameraShake.Instance.Shake(0.3f, 0.2f);
+                playerHealth.TakeDamage(damageAmount);
+                CameraShake.Instance.Shake(0.3f, 0.2f);
 
-                    isStunned = true;
-                    stunTimer = stunDuration;
-                    currentSpeed = 0f;
-                }
+                isStunned = true;
+                stunTimer = stunDuration;
+                currentSpeed = 0f;
             }
         }
         else
@@ -121,6 +125,12 @@ public class StealthEnemy : MonoBehaviour
 
     void CheckVisibilityAndLineOfSight()
     {
+        if (currentPhase == EnemyPhase.Phase2)
+        {
+            currentSpeed = phase2ChaseSpeed;
+            return;
+        }
+
         Vector3 viewportPoint = playerCamera.WorldToViewportPoint(transform.position);
         bool isInCameraView = viewportPoint.z > 0 &&
                               viewportPoint.x > 0 && viewportPoint.x < 1 &&
@@ -129,17 +139,67 @@ public class StealthEnemy : MonoBehaviour
         bool hasLineOfSight = !Physics.Linecast(player.position, transform.position, obstacleMask);
 
         if (isInCameraView && hasLineOfSight)
-        {
             currentSpeed = idleSpeed;
-        }
         else if (hasLineOfSight)
-        {
             currentSpeed = chaseSpeed;
-        }
         else
-        {
             currentSpeed = sneakSpeed;
+    }
+
+    public void FlashStun(Vector3 awayFromPosition, float stunTime = 3f, int maxAttempts = 10, float minDistance = 20f, float maxDistance = 40f)
+    {
+        if (currentPhase != EnemyPhase.Phase2) return;
+
+        bool positionFound = false;
+        NavMeshHit hit = new NavMeshHit();
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere;
+            randomDirection.y = 0;
+
+            float randomDistance = Random.Range(minDistance, maxDistance);
+            Vector3 candidatePos = player.position + randomDirection.normalized * randomDistance;
+
+            if (NavMesh.SamplePosition(candidatePos, out hit, 5f, NavMesh.AllAreas))
+            {
+                positionFound = true;
+                break;
+            }
         }
+
+        if (positionFound)
+        {
+            agent.Warp(hit.position);
+        }
+
+        isStunned = true;
+        stunTimer = stunTime;
+        agent.isStopped = true;
+        SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
+    }
+
+    private void HandlePhaseChange()
+    {
+        if (GameManager.Instance.isInPhase2)
+            SwitchToPhase2();
+        else
+            SwitchToPhase1();
+    }
+
+    private void SwitchToPhase2()
+    {
+        currentPhase = EnemyPhase.Phase2;
+        currentSpeed = phase2ChaseSpeed;
+        agent.speed = currentSpeed;
+        SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
+    }
+
+    private void SwitchToPhase1()
+    {
+        currentPhase = EnemyPhase.Phase1;
+        currentSpeed = sneakSpeed;
+        agent.speed = currentSpeed;
     }
 
     void OnDrawGizmosSelected()

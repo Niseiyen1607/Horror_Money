@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0de9b47a09ebc4042b1443d81daa089a
+guid: bbd097ffc637e80429a306871af841de
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Pixelout Personal Use Only
+  - CutePixel
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

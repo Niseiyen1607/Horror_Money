@@ -37,7 +37,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= amount;
         Debug.Log("Player took damage. Current HP: " + currentHealth);
 
-        SoundManager.Instance.PlayPlayerDamageSound();
+        SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.playerDamageClip);
         UIManager.Instance.ShowDust(); 
 
         if (currentHealth <= 0)
@@ -70,6 +70,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void ReloadCurrentScene()
     {
+        UIManager.Instance.HideGameOverScreen();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

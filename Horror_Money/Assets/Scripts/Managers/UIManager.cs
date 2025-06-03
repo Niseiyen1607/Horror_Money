@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class UIManager : MonoBehaviour
     public GameObject dustOverlay;
 
     private CanvasGroup dustGroup;
+
+    [Header("Item Popup")]
+    public GameObject itemValuePopupPrefab;
+    public Transform itemPopupContainer; 
 
     private void Awake()
     {
@@ -51,5 +56,39 @@ public class UIManager : MonoBehaviour
         dustOverlay.SetActive(true);
         dustGroup.alpha = 1f; 
         gameOverText.SetActive(true);
+    }
+    public void HideGameOverScreen()
+    {
+        bloodOverlay.SetActive(false);
+        dustOverlay.SetActive(false);
+        gameOverText.SetActive(false);
+    }
+
+    public void ShowItemValuePopup(int value)
+    {
+        GameObject popup = Instantiate(itemValuePopupPrefab, itemPopupContainer);
+        popup.SetActive(true);
+
+        TextMeshProUGUI text = popup.GetComponent<TextMeshProUGUI>();
+        text.text = $"{value}";
+
+        RectTransform rect = popup.GetComponent<RectTransform>();
+        CanvasGroup group = popup.GetComponent<CanvasGroup>();
+        if (group == null) group = popup.AddComponent<CanvasGroup>();
+        group.alpha = 1f;
+
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
+
+        Sequence s = DOTween.Sequence();
+
+        float randomRot = Random.Range(-10f, 10f);
+        rect.localRotation = Quaternion.Euler(0f, 0f, randomRot);
+
+        s.Append(rect.DOShakeScale(0.5f, strength: 0.6f, vibrato: 15, randomness: 90f))
+         .Join(rect.DOLocalMoveY(rect.localPosition.y + 30f, 0.5f).SetEase(Ease.OutCubic)) 
+         .AppendInterval(0.2f)
+         .Append(group.DOFade(0f, 0.5f))
+         .OnComplete(() => Destroy(popup));
     }
 }

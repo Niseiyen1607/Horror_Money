@@ -86,7 +86,15 @@ public class HandCamera : MonoBehaviour
         photoDisplay.texture = renderTexture;
 
         SoundManager.Instance.PlayFlash(transform.position);
+
+        var enemies = FindFirstObjectByType<StealthEnemy>();
+        float dist = Vector3.Distance(transform.position, enemies.transform.position);
+        if (dist < 50f)
+        {
+            enemies.FlashStun(transform.position);
+        }
     }
+
 
     IEnumerator PhotoCooldown()
     {

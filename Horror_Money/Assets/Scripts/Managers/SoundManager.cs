@@ -18,6 +18,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip playerDeath;
     public AudioClip playerDamageClip;
     public AudioClip[] pickUp;
+    public AudioClip phase2Enemy;
+    public AudioClip enemyFlashStun;
 
     [Header("Footsteps")]
     public AudioClip[] playerFootstepClips;
@@ -61,12 +63,12 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public void PlayPlayerDamageSound()
+    public void PlayGlobalOneShot(AudioClip clip)
     {
-        if (playerDamageClip == null) return;
+        if (clip == null) return;
 
         globalSource.pitch = Random.Range(minPitch, maxPitch);
-        globalSource.PlayOneShot(playerDamageClip, globalVolume);
+        globalSource.PlayOneShot(clip, globalVolume);
         globalSource.pitch = 1f;
     }
 
@@ -125,6 +127,11 @@ public class SoundManager : MonoBehaviour
     public void PlayFlash(Vector3 position) { 
         PlayRandomSFXAtPoint(flashClips, position, globalSFXMixerGroup); 
     }
+
+    public void PlayPhase2Enemy(Vector3 position, float maxDistance)
+    {
+        PlayRandomSFXAtPoint(new AudioClip[] { phase2Enemy }, position, jumpScareSFXMixerGroup, maxDistance);
+    }   
 
     public void PlayLooping(AudioSource source, AudioClip clip, AudioMixerGroup mixerGroup)
     {
