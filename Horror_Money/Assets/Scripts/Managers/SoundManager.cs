@@ -17,6 +17,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] zoomClips;
     public AudioClip playerDeath;
     public AudioClip playerDamageClip;
+    public AudioClip[] pickUp;
 
     [Header("Footsteps")]
     public AudioClip[] playerFootstepClips;
@@ -110,7 +111,6 @@ public class SoundManager : MonoBehaviour
             Destroy(tempGO, clip.length);
         }
     }
-
 
     public void PlayPlayerFootstep(Vector3 position)
     {
