@@ -39,8 +39,14 @@ public class FirstPersonController : MonoBehaviour
     private float landingOffset = 0f;
     private float landingVelocity = 0f;
 
+    private float footstepTimer = 0f;
+    [SerializeField] private float footstepInterval = 0.5f;
+
+    private PlayerHealth playerHealth;
+
     void Start()
     {
+        playerHealth = GetComponent<PlayerHealth>();
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -53,6 +59,8 @@ public class FirstPersonController : MonoBehaviour
 
     void Update()
     {
+        if (playerHealth.isDead) return;
+
         HandleMouseLook();
         HandleMovement();
         HandleJump();
@@ -101,6 +109,21 @@ public class FirstPersonController : MonoBehaviour
         if (move.magnitude > 0.1f && isGrounded)
         {
             bobTimer += Time.deltaTime * bobFrequency;
+
+            if (move.magnitude > 0.1f && isGrounded)
+            {
+                footstepTimer += Time.deltaTime;
+                if (footstepTimer >= footstepInterval)
+                {
+                    footstepTimer = 0f;
+                    SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.playerFootstepClips);
+                }
+            }
+            else
+            {
+                footstepTimer = 0f;
+            }
+
         }
         else
         {

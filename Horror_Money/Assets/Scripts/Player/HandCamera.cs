@@ -72,6 +72,8 @@ public class HandCamera : MonoBehaviour
 
             liveCamera.fieldOfView = photoCamera.fieldOfView; 
             liveCamera.fieldOfView = Mathf.Clamp(liveCamera.fieldOfView, minFOV, maxFOV);
+
+            SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.zoomClips);
         }
     }
 
@@ -82,6 +84,8 @@ public class HandCamera : MonoBehaviour
         StartCoroutine(Flash());
         photoCamera.Render();
         photoDisplay.texture = renderTexture;
+
+        SoundManager.Instance.PlayFlash(transform.position);
     }
 
     IEnumerator PhotoCooldown()
