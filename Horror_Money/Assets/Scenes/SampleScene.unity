@@ -662,6 +662,51 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &151682176
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 151682178}
+  - component: {fileID: 151682177}
+  m_Layer: 0
+  m_Name: GAME_MANAGER
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &151682177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151682176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637ec8f06e554084190af113a987e779, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  totalItemValue: 0
+--- !u!4 &151682178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151682176}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -19.679745, y: -6.5902343, z: -5.360332}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &221828676
 GameObject:
   m_ObjectHideFlags: 0
@@ -2967,7 +3012,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &838325219
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5681,7 +5729,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &1322876097
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6111,7 +6162,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &1504188763
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6241,7 +6295,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   footstepInterval: 0.2
-  distanceMaxVolume: 50
+  distanceMaxVolume: 25
   idleSpeed: 0
   sneakSpeed: 7
   chaseSpeed: 30
@@ -6686,7 +6740,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &1736015881
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6940,7 +6997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &1920650916
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7338,7 +7398,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Item
-  pickupParticlesPrefab: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  minValue: 0
+  maxValue: 100
+  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
+  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!65 &2135054343
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7436,6 +7499,7 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1471340151}
   - {fileID: 287494189}
+  - {fileID: 151682178}
   - {fileID: 1797869346}
   - {fileID: 598970496}
   - {fileID: 1512569073}
