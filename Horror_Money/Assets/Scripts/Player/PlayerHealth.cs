@@ -37,10 +37,15 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= amount;
         Debug.Log("Player took damage. Current HP: " + currentHealth);
 
+        SoundManager.Instance.PlayPlayerDamageSound();
+        UIManager.Instance.ShowDust(); 
+
         if (currentHealth <= 0)
         {
             isDead = true;
             Debug.Log("Player is dead.");
+            SoundManager.Instance.PlayJumpScareSFX(SoundManager.Instance.playerDeath);
+            UIManager.Instance.ShowGameOverScreen(); 
             CameraShake.Instance.Shake(0.5f, 0.5f);
             ReloadScene();
         }
@@ -55,6 +60,7 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         Debug.Log("Player health regenerated to max: " + currentHealth);
+        UIManager.Instance.FadeOutDust();
     }
 
     public void ReloadScene()

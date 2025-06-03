@@ -9,19 +9,18 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioMixerGroup footstepsMixerGroup;
     [SerializeField] private AudioMixerGroup globalSFXMixerGroup;
     [SerializeField] private AudioMixerGroup enemySFXMixerGroup;
+    [SerializeField] private AudioMixerGroup jumpScareSFXMixerGroup;
 
     [Header("Global Audio")]
     public AudioSource globalSource;
     public AudioClip[] flashClips;
     public AudioClip[] zoomClips;
     public AudioClip playerDeath;
+    public AudioClip playerDamageClip;
 
     [Header("Footsteps")]
     public AudioClip[] playerFootstepClips;
     public AudioClip[] enemyFootstepClips;
-
-    [Header("Footsteps Settings")]
-    [SerializeField] private float enemyFootstepMaxDistance = 15f;
 
     [Header("Volume Settings")]
     [Range(0f, 1f)] [SerializeField] private float globalVolume = 1f;
@@ -30,8 +29,6 @@ public class SoundManager : MonoBehaviour
     [Header("Pitch Variation")]
     [SerializeField] private float minPitch = 0.8f;
     [SerializeField] private float maxPitch = 1.2f;
-
-
 
     private void Awake()
     {
@@ -63,6 +60,15 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void PlayPlayerDamageSound()
+    {
+        if (playerDamageClip == null) return;
+
+        globalSource.pitch = Random.Range(minPitch, maxPitch);
+        globalSource.PlayOneShot(playerDamageClip, globalVolume);
+        globalSource.pitch = 1f;
+    }
+
     public void PlayRandomSFXAtPoint(AudioClip[] clips, Vector3 position, AudioMixerGroup mixerGroup, float maxDistance = 20f)
     {
         if (clips != null && clips.Length > 0)
@@ -87,15 +93,33 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void PlayJumpScareSFX(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            GameObject tempGO = new GameObject("JumpScareAudio");
+            AudioSource source = tempGO.AddComponent<AudioSource>();
+
+            source.clip = clip;
+            source.outputAudioMixerGroup = jumpScareSFXMixerGroup;
+            source.volume = globalVolume;
+            source.pitch = 1f;
+            source.spatialBlend = 0f;
+            source.Play();
+
+            Destroy(tempGO, clip.length);
+        }
+    }
+
 
     public void PlayPlayerFootstep(Vector3 position)
     {
         PlayRandomSFXAtPoint(playerFootstepClips, position, footstepsMixerGroup);
     }
 
-    public void PlayEnemyFootstep(Vector3 position)
+    public void PlayEnemyFootstep(Vector3 position, float maxDistance)
     {
-        PlayRandomSFXAtPoint(enemyFootstepClips, position, enemySFXMixerGroup);
+        PlayRandomSFXAtPoint(enemyFootstepClips, position, enemySFXMixerGroup, maxDistance);
     }
 
     public void PlayFlash(Vector3 position) { 

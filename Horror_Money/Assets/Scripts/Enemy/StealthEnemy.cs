@@ -15,6 +15,7 @@ public class StealthEnemy : MonoBehaviour
     [Header("Audio")]
     private float enemyFootstepTimer = 0f;
     [SerializeField] private float footstepInterval = 0.2f;
+    [SerializeField] private float distanceMaxVolume = 50f;
 
     [Header("Movement Settings")]
     public float idleSpeed = 0f;
@@ -78,7 +79,7 @@ public class StealthEnemy : MonoBehaviour
                 if (enemyFootstepTimer >= footstepInterval)
                 {
                     enemyFootstepTimer = 0f;
-                    SoundManager.Instance.PlayEnemyFootstep(transform.position);
+                    SoundManager.Instance.PlayEnemyFootstep(transform.position, distanceMaxVolume);
                 }
             }
             else
@@ -106,7 +107,6 @@ public class StealthEnemy : MonoBehaviour
                     playerHealth.TakeDamage(damageAmount);
                     CameraShake.Instance.Shake(0.3f, 0.2f);
 
-                    // Déclenche l'immobilisation après attaque
                     isStunned = true;
                     stunTimer = stunDuration;
                     currentSpeed = 0f;
