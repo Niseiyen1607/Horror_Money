@@ -10,6 +10,9 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverText;
     public GameObject dustOverlay;
 
+    [Header("Goal UI")]
+    public TextMeshProUGUI goalText;
+
     private CanvasGroup dustGroup;
 
     [Header("Item Popup")]
@@ -38,6 +41,13 @@ public class UIManager : MonoBehaviour
         dustOverlay.SetActive(true);
         dustGroup.alpha = 1f;
     }
+
+    public void UpdateGoalText(int currentValue, int goal)
+    {
+        if (goalText != null)
+            goalText.text = $"${currentValue} / ${goal}";
+    }
+
 
     public void FadeOutDust(float duration = 1f)
     {

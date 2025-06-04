@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class StealthEnemy : MonoBehaviour
@@ -20,9 +20,11 @@ public class StealthEnemy : MonoBehaviour
 
     [Header("Movement Settings")]
     public float idleSpeed = 0f;
-    public float sneakSpeed = 2f;
+    public float sneakSpeed = 5f;
     public float chaseSpeed = 10f;
     public float phase2ChaseSpeed = 50f;
+
+    public float postGoalChaseSpeed = 70f; 
 
     private float currentSpeed = 0f;
 
@@ -125,6 +127,12 @@ public class StealthEnemy : MonoBehaviour
 
     void CheckVisibilityAndLineOfSight()
     {
+        if (GameManager.Instance.isPostGoalPhase)
+        {
+            currentSpeed = postGoalChaseSpeed;
+            return;
+        }
+
         if (currentPhase == EnemyPhase.Phase2)
         {
             currentSpeed = phase2ChaseSpeed;
@@ -148,43 +156,62 @@ public class StealthEnemy : MonoBehaviour
 
     public void FlashStun(Vector3 awayFromPosition, float stunTime = 3f, int maxAttempts = 10, float minDistance = 20f, float maxDistance = 40f)
     {
-        if (currentPhase != EnemyPhase.Phase2) return;
-
-        bool positionFound = false;
-        NavMeshHit hit = new NavMeshHit();
-
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        if (currentPhase == EnemyPhase.Phase2)
         {
-            Vector3 randomDirection = Random.insideUnitSphere;
-            randomDirection.y = 0;
+            bool positionFound = false;
+            NavMeshHit hit = new NavMeshHit();
 
-            float randomDistance = Random.Range(minDistance, maxDistance);
-            Vector3 candidatePos = player.position + randomDirection.normalized * randomDistance;
-
-            if (NavMesh.SamplePosition(candidatePos, out hit, 5f, NavMesh.AllAreas))
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
-                positionFound = true;
-                break;
+                Vector3 randomDirection = Random.insideUnitSphere;
+                randomDirection.y = 0;
+
+                float randomDistance = Random.Range(minDistance, maxDistance);
+                Vector3 candidatePos = player.position + randomDirection.normalized * randomDistance;
+
+                if (NavMesh.SamplePosition(candidatePos, out hit, 5f, NavMesh.AllAreas))
+                {
+                    positionFound = true;
+                    break;
+                }
             }
-        }
 
-        if (positionFound)
+            if (positionFound)
+            {
+                agent.Warp(hit.position);
+            }
+
+            isStunned = true;
+            stunTimer = stunTime;
+            agent.isStopped = true;
+            SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
+        }
+        else if (currentPhase == EnemyPhase.Phase1)
         {
-            agent.Warp(hit.position);
+            isStunned = true;
+            stunTimer = stunTime * 0.5f; 
+            agent.isStopped = true;
+            SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
         }
-
-        isStunned = true;
-        stunTimer = stunTime;
-        agent.isStopped = true;
-        SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
     }
 
     private void HandlePhaseChange()
     {
-        if (GameManager.Instance.isInPhase2)
+        if (GameManager.Instance.isPostGoalPhase)
+        {
+            currentPhase = EnemyPhase.Phase2;
+            currentSpeed = postGoalChaseSpeed;
+            agent.speed = currentSpeed;
+            SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
+        }
+        else if (GameManager.Instance.isInPhase2)
+        {
             SwitchToPhase2();
+        }
         else
+        {
             SwitchToPhase1();
+        }
     }
 
     private void SwitchToPhase2()

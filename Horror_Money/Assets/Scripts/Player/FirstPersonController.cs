@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -6,6 +6,7 @@ public class FirstPersonController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float walkSpeed = 6f;
+    [SerializeField] private float runSpeed = 10f; // ← Vitesse de course
     [SerializeField] private float crouchSpeed = 3f;
     [SerializeField] private float jumpHeight = 1.2f;
     [SerializeField] private float gravity = -9.81f;
@@ -30,6 +31,8 @@ public class FirstPersonController : MonoBehaviour
     private bool isGrounded;
     private bool wasGrounded;
     private bool isCrouching = false;
+    private bool isRunning = false;
+
     private float xRotation = 0f;
     private float originalCameraY;
     private float targetCameraY;
@@ -88,19 +91,17 @@ public class FirstPersonController : MonoBehaviour
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
-
-            if (!wasGrounded)
-            {
-                landingOffset = -landBobAmount;
-            }
+            if (!wasGrounded) landingOffset = -landBobAmount;
         }
 
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
-        float speed = isCrouching ? crouchSpeed : walkSpeed;
 
+        isRunning = Input.GetKey(KeyCode.LeftShift) && !isCrouching;
+
+        float speed = isCrouching ? crouchSpeed : (isRunning ? runSpeed : walkSpeed);
         controller.Move(move * speed * Time.deltaTime);
 
         velocity.y += gravity * Time.deltaTime;
@@ -110,24 +111,19 @@ public class FirstPersonController : MonoBehaviour
         {
             bobTimer += Time.deltaTime * bobFrequency;
 
-            if (move.magnitude > 0.1f && isGrounded)
-            {
-                footstepTimer += Time.deltaTime;
-                if (footstepTimer >= footstepInterval)
-                {
-                    footstepTimer = 0f;
-                    SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.playerFootstepClips);
-                }
-            }
-            else
+            footstepTimer += Time.deltaTime;
+            float interval = isRunning ? footstepInterval * 0.6f : footstepInterval; 
+
+            if (footstepTimer >= interval)
             {
                 footstepTimer = 0f;
+                SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.playerFootstepClips);
             }
-
         }
         else
         {
             bobTimer = 0;
+            footstepTimer = 0f;
         }
     }
 

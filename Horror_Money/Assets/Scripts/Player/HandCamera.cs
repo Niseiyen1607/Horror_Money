@@ -35,6 +35,17 @@ public class HandCamera : MonoBehaviour
     private bool canTakePhoto = true;
     private int currentPhotoCount = 0;
 
+    [Header("Flash Colors")]
+    [SerializeField] private Color normalFlashColor = Color.white;
+    [SerializeField] private Color violetFlashColor = new Color(0.6f, 0f, 1f); // Violet
+
+    [SerializeField] private int violetFlashCount = 2;
+    [SerializeField] private int normalFlashCount = 10;
+
+    private int currentNormalFlash = 0;
+    private int currentVioletFlash = 0;
+
+
     void Start()
     {
         photoCamera.targetTexture = renderTexture;
@@ -49,10 +60,18 @@ public class HandCamera : MonoBehaviour
         HandleFocus();
         HandleZoom();
 
-        if (Input.GetMouseButtonDown(0) && canTakePhoto && currentPhotoCount < maxPhotoCount)
+        if (Input.GetMouseButtonDown(0) && canTakePhoto && currentNormalFlash < normalFlashCount)
         {
-            TakePhoto();
+            currentNormalFlash++;
+            TakePhoto(false);
         }
+
+        if (Input.GetKeyDown(KeyCode.Q) && canTakePhoto && currentVioletFlash < violetFlashCount)
+        {
+            currentVioletFlash++;
+            TakePhoto(true);
+        }
+
     }
 
     void HandleFocus()
@@ -77,24 +96,27 @@ public class HandCamera : MonoBehaviour
         }
     }
 
-    void TakePhoto()
+    void TakePhoto(bool isViolet)
     {
         currentPhotoCount++;
         StartCoroutine(PhotoCooldown());
-        StartCoroutine(Flash());
+
+        StartCoroutine(Flash(isViolet));
         photoCamera.Render();
         photoDisplay.texture = renderTexture;
 
         SoundManager.Instance.PlayFlash(transform.position);
 
-        var enemies = FindFirstObjectByType<StealthEnemy>();
-        float dist = Vector3.Distance(transform.position, enemies.transform.position);
-        if (dist < 50f)
+        if (isViolet)
         {
-            enemies.FlashStun(transform.position);
+            var enemies = FindFirstObjectByType<StealthEnemy>();
+            float dist = Vector3.Distance(transform.position, enemies.transform.position);
+            if (dist < 50f)
+            {
+                enemies.FlashStun(transform.position);
+            }
         }
     }
-
 
     IEnumerator PhotoCooldown()
     {
@@ -103,18 +125,18 @@ public class HandCamera : MonoBehaviour
         canTakePhoto = true;
     }
 
-    IEnumerator Flash()
+    IEnumerator Flash(bool isViolet)
     {
         flashLight.enabled = true;
+        flashLight.color = isViolet ? violetFlashColor : normalFlashColor;
         flashLight.intensity = maxFlashIntensity;
 
         float elapsed = 0f;
-        float duration = flashDuration;
 
-        while (elapsed < duration)
+        while (elapsed < flashDuration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
+            float t = elapsed / flashDuration;
             flashLight.intensity = Mathf.Lerp(maxFlashIntensity, 0f, Mathf.SmoothStep(0f, 1f, t));
             yield return null;
         }

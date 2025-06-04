@@ -6,6 +6,17 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public int totalItemValue = 0;
+
+    [Header("Fin de Partie")]
+    public int goalValue;
+    public int minGoalValue = 200;
+    public int maxGoalValue = 1300;
+    public GameObject exitObject;
+    private bool exitSpawned = false;
+
+    public bool isPostGoalPhase = false;
+
+    [Header("Phase 2")]
     public float phaseDuration = 300f;
     private float phaseTimer = 0f;
     public bool isInPhase2 = false;
@@ -21,6 +32,17 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        goalValue = UnityEngine.Random.Range(minGoalValue, maxGoalValue + 1);
+        Debug.Log("Valeur cible à atteindre : " + goalValue);
+
+        if (exitObject != null)
+            exitObject.SetActive(false);
+
+        UIManager.Instance.UpdateGoalText(totalItemValue, goalValue);
     }
 
     private void Update()
@@ -52,6 +74,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //For enemy phase 2 activation
     private void TriggerPhase2()
     {
         if (isInPhase2) return;
@@ -70,7 +93,25 @@ public class GameManager : MonoBehaviour
 
     public void AddItemValue(int value)
     {
+        if (isPostGoalPhase)
+            value = Mathf.RoundToInt(value * 1.5f);
+
         totalItemValue += value;
         Debug.Log("Valeur totale ramassée : " + totalItemValue);
+
+        UIManager.Instance.UpdateGoalText(totalItemValue, goalValue);
+
+        if (!exitSpawned && totalItemValue >= goalValue)
+        {
+            Debug.Log("Objectif atteint ! Apparition de la sortie.");
+            exitSpawned = true;
+            isPostGoalPhase = true;
+
+            if (exitObject != null)
+                exitObject.SetActive(true);
+
+            OnPhaseChanged?.Invoke();
+        }
     }
+
 }
