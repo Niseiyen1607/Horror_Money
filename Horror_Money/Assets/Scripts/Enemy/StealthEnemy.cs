@@ -23,10 +23,13 @@ public class StealthEnemy : MonoBehaviour
     public float sneakSpeed = 5f;
     public float chaseSpeed = 10f;
     public float phase2ChaseSpeed = 50f;
-
     public float postGoalChaseSpeed = 70f; 
 
     private float currentSpeed = 0f;
+
+    [Header("Teleport Settings")]
+    public float teleportMinDistance = 20f;
+    public float teleportMaxDistance = 40f;
 
     [Header("Attack Settings")]
     public float attackRange = 2.5f;
@@ -155,7 +158,7 @@ public class StealthEnemy : MonoBehaviour
             currentSpeed = sneakSpeed;
     }
 
-    public void FlashStun(Vector3 awayFromPosition, float stunTime = 3f, int maxAttempts = 10, float minDistance = 20f, float maxDistance = 40f)
+    public void FlashStun(Vector3 awayFromPosition, float stunTime = 3f, int maxAttempts = 10)
     {
         if (currentPhase == EnemyPhase.Phase2)
         {
@@ -167,7 +170,7 @@ public class StealthEnemy : MonoBehaviour
                 Vector3 randomDirection = Random.insideUnitSphere;
                 randomDirection.y = 0;
 
-                float randomDistance = Random.Range(minDistance, maxDistance);
+                float randomDistance = Random.Range(teleportMinDistance, teleportMaxDistance);
                 Vector3 candidatePos = player.position + randomDirection.normalized * randomDistance;
 
                 if (NavMesh.SamplePosition(candidatePos, out hit, 5f, NavMesh.AllAreas))
@@ -190,7 +193,7 @@ public class StealthEnemy : MonoBehaviour
         else if (currentPhase == EnemyPhase.Phase1)
         {
             isStunned = true;
-            stunTimer = stunTime * 0.5f; 
+            stunTimer = stunTime * 0.5f;
             agent.isStopped = true;
             SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
         }
