@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - Interactable
+  - photo-valeurs
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PostProcess
   - Water
   - UI
   - Obstacle

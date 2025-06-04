@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 8536428873463552966}
   - component: {fileID: 3138719473327548836}
   - component: {fileID: 8401020404466810419}
-  - component: {fileID: 4835201653453164679}
   - component: {fileID: 7816230724778906420}
   - component: {fileID: 599108942558800222}
+  - component: {fileID: 1015693461719139375}
   m_Layer: 0
-  m_Name: ObjectValue
-  m_TagString: Interactable
+  m_Name: PhotoObjectValue
+  m_TagString: photo-valeurs
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 45b9a8bb03efab440ac42b8d3273db8e, type: 2}
+  - {fileID: 2100000, guid: de62cd646ecbf994b810747e90bb9e8e, type: 2}
   - {fileID: 2100000, guid: fff21aa838779404383aaf8fb5b5a3ba, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -112,23 +112,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4835201653453164679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2097073125315099606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a88e0086d3cf6b4abe72ec205fed128, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemName: Item
-  minValue: 0
-  maxValue: 100
-  normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
-  emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!114 &7816230724778906420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,3 +151,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1015693461719139375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097073125315099606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c00dc2ca5253bb24eb4a6876ae5479eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePhotoValue: 50
+  valueDecayFactor: 0.7
+  photoCount: 0

@@ -20,6 +20,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] pickUp;
     public AudioClip phase2Enemy;
     public AudioClip enemyFlashStun;
+    public AudioClip stealthJumpscareSounds;
 
     [Header("Footsteps")]
     public AudioClip[] playerFootstepClips;

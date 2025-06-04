@@ -5,15 +5,17 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [Header("Item Collection")]
     public int totalItemValue = 0;
 
-    [Header("Fin de Partie")]
     public int goalValue;
     public int minGoalValue = 200;
     public int maxGoalValue = 1300;
+    [Header("Exit Object")]
     public GameObject exitObject;
     private bool exitSpawned = false;
 
+    [Header("Game State")]
     public bool isPostGoalPhase = false;
 
     [Header("Phase 2")]

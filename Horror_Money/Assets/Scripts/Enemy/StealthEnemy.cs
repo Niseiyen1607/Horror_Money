@@ -36,6 +36,7 @@ public class StealthEnemy : MonoBehaviour
     private float damageTimer = 0f;
     private PlayerHealth playerHealth;
 
+    [Header("Stun Settings")]
     private bool isStunned = false;
     private float stunTimer = 0f;
     public float stunDuration = 5f;

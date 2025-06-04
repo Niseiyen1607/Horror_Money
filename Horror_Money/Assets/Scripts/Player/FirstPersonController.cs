@@ -6,7 +6,7 @@ public class FirstPersonController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float walkSpeed = 6f;
-    [SerializeField] private float runSpeed = 10f; // ← Vitesse de course
+    [SerializeField] private float runSpeed = 10f; 
     [SerializeField] private float crouchSpeed = 3f;
     [SerializeField] private float jumpHeight = 1.2f;
     [SerializeField] private float gravity = -9.81f;

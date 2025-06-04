@@ -37,13 +37,15 @@ public class HandCamera : MonoBehaviour
 
     [Header("Flash Colors")]
     [SerializeField] private Color normalFlashColor = Color.white;
-    [SerializeField] private Color violetFlashColor = new Color(0.6f, 0f, 1f); // Violet
+    [SerializeField] private Color violetFlashColor = new Color(0.6f, 0f, 1f); 
 
     [SerializeField] private int violetFlashCount = 2;
     [SerializeField] private int normalFlashCount = 10;
 
     private int currentNormalFlash = 0;
     private int currentVioletFlash = 0;
+
+    [SerializeField] PlayerHealth playerHealth;
 
 
     void Start()
@@ -57,6 +59,8 @@ public class HandCamera : MonoBehaviour
 
     void Update()
     {
+        if (playerHealth.isDead) return;
+
         HandleFocus();
         HandleZoom();
 
@@ -116,7 +120,32 @@ public class HandCamera : MonoBehaviour
                 enemies.FlashStun(transform.position);
             }
         }
+        else
+        {
+            DetectPhotoValuableObject();
+        }
     }
+
+    void DetectPhotoValuableObject()
+    {
+        Ray ray = photoCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        RaycastHit hit;
+
+        float maxDistance = 50f;
+
+        if (Physics.Raycast(ray, out hit, maxDistance))
+        {
+            PhotoValuableObject valuable = hit.collider.GetComponent<PhotoValuableObject>();
+            if (valuable != null)
+            {
+                int value = valuable.RegisterPhoto();
+                GameManager.Instance.AddItemValue(value);
+                SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
+                Debug.Log($"Photo prise de {valuable.gameObject.name} +{value} points (photo n°{valuable.photoCount})");
+            }
+        }
+    }
+
 
     IEnumerator PhotoCooldown()
     {

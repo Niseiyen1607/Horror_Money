@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
+    [Header("UI Elements")]
     public GameObject bloodOverlay;
     public GameObject gameOverText;
     public GameObject dustOverlay;
