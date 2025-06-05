@@ -128,6 +128,12 @@ public class HandCamera : MonoBehaviour
         if (isViolet)
         {
             var enemies = FindFirstObjectByType<StealthEnemy>();
+
+            if (enemies == null)
+            {
+                Debug.LogWarning("No StealthEnemy found in the scene.");
+                return;
+            }
             float dist = Vector3.Distance(transform.position, enemies.transform.position);
             if (dist < 50f)
             {
@@ -187,28 +193,43 @@ public class HandCamera : MonoBehaviour
 
             RawImage photoImage = photoGO.AddComponent<RawImage>();
             photoImage.texture = capturedPhotos[i];
-            photoImage.color = new Color(1, 1, 1, 0);
+            photoImage.color = Color.white; // Opacité 1 directe
 
             RectTransform rt = photoGO.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(500, 300);
-            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(900, 900);
+
+            // Décalage aléatoire type Polaroid (petit offset x et y)
+            float offsetX = Random.Range(-30f, 30f) + i * 10f; // chaque photo décale un peu vers la droite
+            float offsetY = Random.Range(-20f, 20f) - i * 5f;  // chaque photo décale un peu vers le bas
+            rt.anchoredPosition = new Vector2(offsetX, offsetY);
             rt.localScale = Vector3.one;
 
-            // Set base rotation Y = 90 to simulate card back, then rotate to 0 (reveal)
-            rt.localEulerAngles = new Vector3(0f, 90f, 0f);
+            // Rotation de départ un peu penchée (à gauche ou droite)
+            float startRot = Random.Range(-15f, 15f);
+            rt.localEulerAngles = new Vector3(0f, 0f, startRot);
 
+            // Sequence : zoom léger + rotation shake gauche-droite + retour à 0° et scale normal
             Sequence s = DOTween.Sequence();
-            s.Append(photoImage.DOFade(1f, 0.2f));
-            s.Join(rt.DOScale(1.2f, 0.3f).SetEase(Ease.OutBack)); // zoom effect
-            s.Join(rt.DORotate(Vector3.zero, 0.5f, RotateMode.Fast).SetEase(Ease.OutCubic)); // card flip
 
-            yield return s.WaitForCompletion(); // wait for this photo to finish
-            yield return new WaitForSeconds(0.7f); // delay before next photo
+            // Zoom in léger + rotation vers droite (shake)
+            s.Append(rt.DOScale(1.2f, 0.15f).SetEase(Ease.OutBack));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot + 10f), 0.15f).SetEase(Ease.InOutSine));
+
+            // Zoom out + rotation vers gauche
+            s.Append(rt.DOScale(0.9f, 0.15f).SetEase(Ease.InOutSine));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot - 10f), 0.15f).SetEase(Ease.InOutSine));
+
+            // Retour à scale 1 et rotation de départ (pose finale)
+            s.Append(rt.DOScale(1f, 0.1f).SetEase(Ease.OutBack));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot), 0.1f).SetEase(Ease.OutBack));
+
+            yield return s.WaitForCompletion();
+
+            yield return new WaitForSeconds(0.2f); // court délai avant la photo suivante
         }
 
         Debug.Log("Fin de la séquence des photos.");
     }
-
 
     IEnumerator PhotoCooldown()
     {
