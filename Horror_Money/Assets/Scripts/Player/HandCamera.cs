@@ -47,14 +47,17 @@ public class HandCamera : MonoBehaviour
 
     [SerializeField] PlayerHealth playerHealth;
 
-
     void Start()
     {
         photoCamera.targetTexture = renderTexture;
         flashLight.enabled = false;
         cameraModel.localPosition = normalPosition;
         photoCamera.fieldOfView = baseFOV; 
-        liveCamera.fieldOfView = baseFOV; 
+        liveCamera.fieldOfView = baseFOV;
+
+        UIManager.Instance.UpdatePhotoCounters(
+            normalFlashCount - currentNormalFlash,
+            violetFlashCount - currentVioletFlash);
     }
 
     void Update()
@@ -124,6 +127,10 @@ public class HandCamera : MonoBehaviour
         {
             DetectPhotoValuableObject();
         }
+
+        UIManager.Instance.UpdatePhotoCounters(
+            normalFlashCount - currentNormalFlash,
+            violetFlashCount - currentVioletFlash);
     }
 
     void DetectPhotoValuableObject()
@@ -145,7 +152,6 @@ public class HandCamera : MonoBehaviour
             }
         }
     }
-
 
     IEnumerator PhotoCooldown()
     {

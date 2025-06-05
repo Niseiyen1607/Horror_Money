@@ -6,13 +6,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("Item Collection")]
-    public int totalItemValue = 0;
+    [SerializeField] private int totalItemValue = 0;
 
-    public int goalValue;
-    public int minGoalValue = 200;
-    public int maxGoalValue = 1300;
+    [SerializeField] private int goalValue;
+    [SerializeField] private int minGoalValue = 200;
+    [SerializeField] private int maxGoalValue = 1300;
+
     [Header("Exit Object")]
-    public GameObject exitObject;
+    [SerializeField] private GameObject exitObject;
     private bool exitSpawned = false;
 
     [Header("Game State")]
@@ -102,6 +103,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Valeur totale ramassée : " + totalItemValue);
 
         UIManager.Instance.UpdateGoalText(totalItemValue, goalValue);
+        UIManager.Instance.ShowItemValuePopup(value);
 
         if (!exitSpawned && totalItemValue >= goalValue)
         {

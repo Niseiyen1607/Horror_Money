@@ -18,7 +18,11 @@ public class UIManager : MonoBehaviour
 
     [Header("Item Popup")]
     public GameObject itemValuePopupPrefab;
-    public Transform itemPopupContainer; 
+    public Transform itemPopupContainer;
+
+    [Header("Photo Counters UI")]
+    public TextMeshPro normalPhotoText;
+    public TextMeshPro violetPhotoText;
 
     private void Awake()
     {
@@ -49,6 +53,13 @@ public class UIManager : MonoBehaviour
             goalText.text = $"${currentValue} / ${goal}";
     }
 
+    public void UpdatePhotoCounters(int normalLeft, int violetLeft)
+    {
+        if (normalPhotoText != null)
+            normalPhotoText.text = $"Photos : {normalLeft}";
+        if (violetPhotoText != null)
+            violetPhotoText.text = $"Filtre bleu : {violetLeft}";
+    }
 
     public void FadeOutDust(float duration = 1f)
     {

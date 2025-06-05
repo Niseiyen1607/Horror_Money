@@ -28,7 +28,6 @@ public class PickUpItem : MonoBehaviour, IInteractable
             Instantiate(emptyPickupParticles, transform.position, Quaternion.identity);
 
         SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
-        UIManager.Instance.ShowItemValuePopup(actualValue);
 
         Destroy(gameObject);
     }

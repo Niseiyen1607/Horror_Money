@@ -4,8 +4,8 @@ using UnityEngine.AI;
 public class StealthEnemy : MonoBehaviour
 {
     [Header("References")]
-    public Transform player;
-    public Camera playerCamera;
+    private Transform player;
+    private Camera playerCamera;
     private NavMeshAgent agent;
 
     [Header("Detection Settings")]
@@ -44,11 +44,17 @@ public class StealthEnemy : MonoBehaviour
     private float stunTimer = 0f;
     public float stunDuration = 5f;
 
+    private float timeSinceLastSeen = 0f;
+    [SerializeField] private float scareSoundDelay = 20f;
+    private bool scareSoundPlayed = false;
+
     public enum EnemyPhase { Phase1, Phase2 }
     public EnemyPhase currentPhase = EnemyPhase.Phase1;
 
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerCamera = Camera.main;
         agent = GetComponent<NavMeshAgent>();
         InvokeRepeating(nameof(CheckVisibilityAndLineOfSight), 0f, visionCheckInterval);
         playerHealth = player.GetComponent<PlayerHealth>();
@@ -199,6 +205,7 @@ public class StealthEnemy : MonoBehaviour
         }
     }
 
+    #region Enemy Phase Handling
     private void HandlePhaseChange()
     {
         if (GameManager.Instance.isPostGoalPhase)
@@ -217,7 +224,6 @@ public class StealthEnemy : MonoBehaviour
             SwitchToPhase1();
         }
     }
-
     private void SwitchToPhase2()
     {
         currentPhase = EnemyPhase.Phase2;
@@ -225,13 +231,13 @@ public class StealthEnemy : MonoBehaviour
         agent.speed = currentSpeed;
         SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
     }
-
     private void SwitchToPhase1()
     {
         currentPhase = EnemyPhase.Phase1;
         currentSpeed = sneakSpeed;
         agent.speed = currentSpeed;
     }
+    #endregion
 
     void OnDrawGizmosSelected()
     {

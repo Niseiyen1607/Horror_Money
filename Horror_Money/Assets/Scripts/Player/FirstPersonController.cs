@@ -47,6 +47,20 @@ public class FirstPersonController : MonoBehaviour
 
     private PlayerHealth playerHealth;
 
+    private static FirstPersonController instance;
+
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject); 
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     void Start()
     {
         playerHealth = GetComponent<PlayerHealth>();
