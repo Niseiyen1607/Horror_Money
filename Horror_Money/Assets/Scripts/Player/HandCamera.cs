@@ -72,6 +72,8 @@ public class HandCamera : MonoBehaviour
     [SerializeField] private GameObject photoValuePopupPrefab;
     [SerializeField] private GameObject finalValueText;
 
+    public bool IsphotoSlide = false;
+
     void Start()
     {
         photoCamera.targetTexture = renderTexture;
@@ -88,6 +90,7 @@ public class HandCamera : MonoBehaviour
     void Update()
     {
         if (playerHealth.isDead) return;
+        if(IsphotoSlide) return;
 
         HandleFocus();
         HandleZoom();
@@ -200,8 +203,23 @@ public class HandCamera : MonoBehaviour
         StartCoroutine(PlayEndPhotoSequence());
     }
 
+    public void IncreasePhoto(int amount)
+    {
+        maxPhotoCount += amount;
+        normalFlashCount += amount; 
+        Debug.Log("Limite photos augmentée à " + maxPhotoCount);
+    }
+
+    public void IncreaseBlueLight(int amount)
+    {
+        maxPhotoCount += amount;
+        violetFlashCount += amount;
+        Debug.Log("Limite flash violets augmentée à " + violetFlashCount);
+    }
+
     private IEnumerator PlayEndPhotoSequence()
     {
+        IsphotoSlide = true;
         Camera.main.transform.DOShakePosition(1f, 0.5f, 10, 90f);
         yield return new WaitForSeconds(0.5f);
 
@@ -212,6 +230,9 @@ public class HandCamera : MonoBehaviour
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         photoPanel.AddComponent<CanvasScaler>();
         photoPanel.AddComponent<GraphicRaycaster>();
+
+        CanvasGroup canvasGroup = photoPanel.AddComponent<CanvasGroup>();
+        canvasGroup.alpha = 1f;
 
         int total = capturedPhotos.Count;
 
@@ -317,6 +338,12 @@ public class HandCamera : MonoBehaviour
 
         SoundManager.Instance.StopBackgroundMusic();
         SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.releaseEnGame);
+
+        yield return new WaitForSeconds(1.0f);
+
+        yield return canvasGroup.DOFade(0f, 1.5f).SetEase(Ease.InOutQuad).WaitForCompletion();
+
+        Destroy(photoPanel);
 
         Debug.Log("Fin de la séquence des photos.");
     }

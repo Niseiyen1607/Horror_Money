@@ -7,6 +7,7 @@ TagManager:
   - Interactable
   - photo-valeurs
   - PlayerSpawnPoint
+  - EndZone
   layers:
   - Default
   - TransparentFX

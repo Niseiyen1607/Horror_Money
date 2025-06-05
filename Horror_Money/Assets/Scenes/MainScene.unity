@@ -682,7 +682,6 @@ MonoBehaviour:
   goalValue: 0
   minGoalValue: 1
   maxGoalValue: 10
-  exitObject: {fileID: 716408833}
   isPostGoalPhase: 0
   phaseDuration: 300
   isInPhase2: 0
@@ -6259,7 +6258,7 @@ GameObject:
   - component: {fileID: 933870365}
   m_Layer: 0
   m_Name: BlockEndZone
-  m_TagString: Untagged
+  m_TagString: EndZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

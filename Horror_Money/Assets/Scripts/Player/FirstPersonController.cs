@@ -46,7 +46,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float footstepInterval = 0.5f;
 
     private PlayerHealth playerHealth;
-
+    [SerializeField] private HandCamera handCamera;
     private static FirstPersonController instance;
 
     void Awake()
@@ -77,6 +77,7 @@ public class FirstPersonController : MonoBehaviour
     void Update()
     {
         if (playerHealth.isDead) return;
+        if (handCamera.IsphotoSlide) return;
 
         HandleMouseLook();
         HandleMovement();

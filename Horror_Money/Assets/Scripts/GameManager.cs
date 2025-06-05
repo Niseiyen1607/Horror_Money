@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int maxGoalValue = 1300;
 
     [Header("Exit Object")]
-    [SerializeField] private GameObject exitObject;
+    private GameObject exitObject;
     private bool exitSpawned = false;
 
     [Header("Game State")]
@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        exitObject = GameObject.FindGameObjectWithTag("EndZone");
         goalValue = UnityEngine.Random.Range(minGoalValue, maxGoalValue + 1);
         Debug.Log("Valeur cible à atteindre : " + goalValue);
 
