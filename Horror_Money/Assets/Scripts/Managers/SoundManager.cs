@@ -14,6 +14,7 @@ public class SoundManager : MonoBehaviour
     [Header("Global Audio")]
     public AudioSource globalSource;
     public AudioClip[] flashClips;
+    public AudioClip[] flashlight;
     public AudioClip[] zoomClips;
     public AudioClip playerDeath;
     public AudioClip playerDamageClip;
@@ -21,6 +22,12 @@ public class SoundManager : MonoBehaviour
     public AudioClip phase2Enemy;
     public AudioClip enemyFlashStun;
     public AudioClip stealthJumpscareSounds;
+
+    [Header("Background Music")]
+    public AudioClip[] photoSlip;
+    public AudioClip buildUpMusic;
+    public AudioClip releaseEnGame;
+    public AudioSource musicSource;
 
     [Header("Footsteps")]
     public AudioClip[] playerFootstepClips;
@@ -51,6 +58,16 @@ public class SoundManager : MonoBehaviour
             globalSource.loop = false;
             globalSource.outputAudioMixerGroup = globalSFXMixerGroup;
         }
+
+        if (musicSource == null)
+        {
+            musicSource = gameObject.AddComponent<AudioSource>();
+            musicSource.playOnAwake = false;
+            musicSource.loop = true;
+            musicSource.outputAudioMixerGroup = globalSFXMixerGroup;
+            musicSource.volume = 1f;
+        }
+
     }
 
     public void PlayRandomGlobalSFX(AudioClip[] clips)
@@ -129,28 +146,26 @@ public class SoundManager : MonoBehaviour
         PlayRandomSFXAtPoint(flashClips, position, globalSFXMixerGroup); 
     }
 
+    public void PlayFlashlight(Vector3 position)
+    {
+        PlayRandomSFXAtPoint(flashlight, position, globalSFXMixerGroup);
+    }
+
     public void PlayPhase2Enemy(Vector3 position, float maxDistance)
     {
         PlayRandomSFXAtPoint(new AudioClip[] { phase2Enemy }, position, jumpScareSFXMixerGroup, maxDistance);
-    }   
-
-    public void PlayLooping(AudioSource source, AudioClip clip, AudioMixerGroup mixerGroup)
-    {
-        if (source != null && clip != null && !source.isPlaying)
-        {
-            source.clip = clip;
-            source.loop = true;
-            source.spatialBlend = 1f;
-            source.volume = spatialVolume;
-            source.pitch = Random.Range(minPitch, maxPitch);
-            source.outputAudioMixerGroup = mixerGroup;
-            source.Play();
-        }
     }
 
-    public void StopLooping(AudioSource source)
+    public void PlayBackgroundMusic(AudioClip clip)
     {
-        if (source != null && source.isPlaying)
-            source.Stop();
+        if (clip == null) return;
+        musicSource.clip = clip;
+        musicSource.loop = true;
+        musicSource.Play();
+    }
+
+    public void StopBackgroundMusic()
+    {
+        musicSource.Stop();
     }
 }

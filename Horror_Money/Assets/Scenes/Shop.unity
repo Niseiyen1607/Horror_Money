@@ -1529,19 +1529,29 @@ MonoBehaviour:
   globalSource: {fileID: 1394898773}
   flashClips:
   - {fileID: 8300000, guid: a9fddaf69d9302a44ba6bc564dda025a, type: 3}
+  flashlight:
+  - {fileID: 8300000, guid: 239e052a159c7754bbfb690ec8be9753, type: 3}
   zoomClips:
   - {fileID: 8300000, guid: cbfb1564bde72804e82ac8c99cf53479, type: 3}
   playerDeath: {fileID: 8300000, guid: 36cd110f325d82149aab99fc44ac02da, type: 3}
   playerDamageClip: {fileID: 8300000, guid: 189edc2327a6f1941a9f5e99c67eef85, type: 3}
   pickUp:
-  - {fileID: 8300000, guid: c7f64fd9e3d343649b34a4ab6771428c, type: 3}
-  - {fileID: 8300000, guid: 8a7c8014af39f62418af0e886f95474f, type: 3}
-  - {fileID: 8300000, guid: fda04f3940a17784c823b56298afc823, type: 3}
-  - {fileID: 8300000, guid: 8111123b87499a64793210d4b4ae0e5f, type: 3}
-  - {fileID: 8300000, guid: 10cf50f395fdf8347bac18b9c087d603, type: 3}
+  - {fileID: 8300000, guid: 2d80153ab4caae3499c8cd9e42d9539b, type: 3}
+  - {fileID: 8300000, guid: bda112c5b5ec2de478739cea95e812d9, type: 3}
+  - {fileID: 8300000, guid: fd166b1e578310246a9630a28e43799f, type: 3}
+  - {fileID: 8300000, guid: 4a23755194e1fab4c824aac8a35756ac, type: 3}
+  - {fileID: 8300000, guid: b958b61d7cc79644fb8ddf196297b8de, type: 3}
+  - {fileID: 8300000, guid: 90dab028d126fe7478843abe986fd8d9, type: 3}
+  - {fileID: 8300000, guid: 8554cfc5124470c4db251ac13b0cb440, type: 3}
   phase2Enemy: {fileID: 8300000, guid: 8225189400b9c2945971172bd29bdc76, type: 3}
   enemyFlashStun: {fileID: 8300000, guid: 9a567c1dff0b9b6418036ed5bab35c3f, type: 3}
   stealthJumpscareSounds: {fileID: 8300000, guid: e3f5fb60ca4a48548911034f609a379d, type: 3}
+  photoSlip:
+  - {fileID: 8300000, guid: 71b9e01140eb55f41a3bc076e3ae4d3b, type: 3}
+  - {fileID: 8300000, guid: 7171837e42fd00f40a24ac6b5c37a36e, type: 3}
+  buildUpMusic: {fileID: 8300000, guid: c34f6af57d5a47c47b7ac0078262a6c3, type: 3}
+  releaseEnGame: {fileID: 8300000, guid: 86630cb2178282f4daa671e2128a2a41, type: 3}
+  musicSource: {fileID: 0}
   playerFootstepClips:
   - {fileID: 8300000, guid: 562541b85cddd274abcceb99332f989e, type: 3}
   - {fileID: 8300000, guid: cfdda23f082911c4a8eb3a6d5eddc5ee, type: 3}
@@ -5441,10 +5451,13 @@ MonoBehaviour:
   maxFOV: 100
   normalFlashColor: {r: 1, g: 1, b: 1, a: 1}
   violetFlashColor: {r: 0.6, g: 0, b: 1, a: 1}
-  violetFlashCount: 10
-  normalFlashCount: 10
+  violetFlashCount: 50
+  normalFlashCount: 50
+  flashOnlyCooldown: 0.8
   playerHealth: {fileID: 1389713226}
   capturedPhotos: []
+  photoValuePopupPrefab: {fileID: 5186535127258146562, guid: 89300c86fc5d10845a6584fe8357aeb2, type: 3}
+  finalValueText: {fileID: 5186535127258146562, guid: 5f6db3311a398ff4a88ef7ea0d063daa, type: 3}
 --- !u!65 &1646678221
 BoxCollider:
   m_ObjectHideFlags: 0

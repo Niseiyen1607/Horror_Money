@@ -1,8 +1,22 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+[System.Serializable]
+public class CapturedPhoto
+{
+    public Texture2D texture;
+    public int value;
+
+    public CapturedPhoto(Texture2D texture, int value = 0)
+    {
+        this.texture = texture;
+        this.value = value;
+    }
+}
 
 public class HandCamera : MonoBehaviour
 {
@@ -14,7 +28,7 @@ public class HandCamera : MonoBehaviour
 
     [Header("Flash Settings")]
     [SerializeField] private Light flashLight;
-    [SerializeField] private float flashDuration = 0.1f;
+    [SerializeField] private float flashDuration = 0.2f;
     [SerializeField] private float maxFlashIntensity = 5f;
 
     [Header("Focus Mode")]
@@ -39,24 +53,31 @@ public class HandCamera : MonoBehaviour
 
     [Header("Flash Colors")]
     [SerializeField] private Color normalFlashColor = Color.white;
-    [SerializeField] private Color violetFlashColor = new Color(0.6f, 0f, 1f); 
+    [SerializeField] private Color violetFlashColor = new Color(0.6f, 0f, 1f);
 
     [SerializeField] private int violetFlashCount = 2;
     [SerializeField] private int normalFlashCount = 10;
+
+    [Header("Flash-Only Settings")]
+    [SerializeField] private float flashOnlyCooldown = 0.8f; 
+    private bool canFlashOnly = true;
+
 
     private int currentNormalFlash = 0;
     private int currentVioletFlash = 0;
 
     [SerializeField] PlayerHealth playerHealth;
 
-    public List<Texture2D> capturedPhotos = new List<Texture2D>();
+    public List<CapturedPhoto> capturedPhotos = new List<CapturedPhoto>();
+    [SerializeField] private GameObject photoValuePopupPrefab;
+    [SerializeField] private GameObject finalValueText;
 
     void Start()
     {
         photoCamera.targetTexture = renderTexture;
         flashLight.enabled = false;
         cameraModel.localPosition = normalPosition;
-        photoCamera.fieldOfView = baseFOV; 
+        photoCamera.fieldOfView = baseFOV;
         liveCamera.fieldOfView = baseFOV;
 
         UIManager.Instance.UpdatePhotoCounters(
@@ -83,6 +104,11 @@ public class HandCamera : MonoBehaviour
             TakePhoto(true);
         }
 
+        if (Input.GetKeyDown(KeyCode.F) && canFlashOnly)
+        {
+            SoundManager.Instance.PlayFlashlight(transform.position);
+            StartCoroutine(FlashOnlyCoroutine());
+        }
     }
 
     void HandleFocus()
@@ -99,9 +125,7 @@ public class HandCamera : MonoBehaviour
         {
             photoCamera.fieldOfView -= scroll * zoomSpeed * 10f;
             photoCamera.fieldOfView = Mathf.Clamp(photoCamera.fieldOfView, minFOV, maxFOV);
-
-            liveCamera.fieldOfView = photoCamera.fieldOfView; 
-            liveCamera.fieldOfView = Mathf.Clamp(liveCamera.fieldOfView, minFOV, maxFOV);
+            liveCamera.fieldOfView = photoCamera.fieldOfView;
 
             SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.zoomClips);
         }
@@ -121,40 +145,38 @@ public class HandCamera : MonoBehaviour
         photo.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         photo.Apply();
         RenderTexture.active = null;
-        capturedPhotos.Add(photo); 
 
-        SoundManager.Instance.PlayFlash(transform.position);
+        int photoValue = 0;
 
         if (isViolet)
         {
             var enemies = FindFirstObjectByType<StealthEnemy>();
-
-            if (enemies == null)
+            if (enemies != null)
             {
-                Debug.LogWarning("No StealthEnemy found in the scene.");
-                return;
-            }
-            float dist = Vector3.Distance(transform.position, enemies.transform.position);
-            if (dist < 50f)
-            {
-                enemies.FlashStun(transform.position);
+                float dist = Vector3.Distance(transform.position, enemies.transform.position);
+                if (dist < 50f)
+                {
+                    enemies.FlashStun(transform.position);
+                }
             }
         }
         else
         {
-            DetectPhotoValuableObject();
+            photoValue = DetectPhotoValuableObject();
         }
+
+        capturedPhotos.Add(new CapturedPhoto(photo, photoValue));
+        SoundManager.Instance.PlayFlash(transform.position);
 
         UIManager.Instance.UpdatePhotoCounters(
             normalFlashCount - currentNormalFlash,
             violetFlashCount - currentVioletFlash);
     }
 
-    void DetectPhotoValuableObject()
+    int DetectPhotoValuableObject()
     {
         Ray ray = photoCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         RaycastHit hit;
-
         float maxDistance = 50f;
 
         if (Physics.Raycast(ray, out hit, maxDistance))
@@ -166,8 +188,11 @@ public class HandCamera : MonoBehaviour
                 GameManager.Instance.AddItemValue(value);
                 SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
                 Debug.Log($"Photo prise de {valuable.gameObject.name} +{value} points (photo n°{valuable.photoCount})");
+                return value;
             }
         }
+
+        return 0;
     }
 
     public void ShowEndPhotos()
@@ -180,53 +205,118 @@ public class HandCamera : MonoBehaviour
         Camera.main.transform.DOShakePosition(1f, 0.5f, 10, 90f);
         yield return new WaitForSeconds(0.5f);
 
+        SoundManager.Instance.PlayBackgroundMusic(SoundManager.Instance.buildUpMusic);
+
         GameObject photoPanel = new GameObject("PhotoPanel");
         Canvas canvas = photoPanel.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         photoPanel.AddComponent<CanvasScaler>();
         photoPanel.AddComponent<GraphicRaycaster>();
 
-        for (int i = 0; i < capturedPhotos.Count; i++)
+        int total = capturedPhotos.Count;
+
+        for (int i = 0; i < total; i++)
         {
+            CapturedPhoto captured = capturedPhotos[i];
+
             GameObject photoGO = new GameObject("Photo_" + i);
             photoGO.transform.SetParent(photoPanel.transform);
 
             RawImage photoImage = photoGO.AddComponent<RawImage>();
-            photoImage.texture = capturedPhotos[i];
-            photoImage.color = Color.white; // Opacité 1 directe
+            photoImage.texture = captured.texture;
+            photoImage.color = Color.white;
 
             RectTransform rt = photoGO.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(900, 900);
-
-            // Décalage aléatoire type Polaroid (petit offset x et y)
-            float offsetX = Random.Range(-30f, 30f) + i * 10f; // chaque photo décale un peu vers la droite
-            float offsetY = Random.Range(-20f, 20f) - i * 5f;  // chaque photo décale un peu vers le bas
+            float offsetX = Random.Range(-30f, 30f) + i * 10f;
+            float offsetY = Random.Range(-20f, 20f) - i * 5f;
             rt.anchoredPosition = new Vector2(offsetX, offsetY);
             rt.localScale = Vector3.one;
-
-            // Rotation de départ un peu penchée (à gauche ou droite)
             float startRot = Random.Range(-15f, 15f);
             rt.localEulerAngles = new Vector3(0f, 0f, startRot);
 
-            // Sequence : zoom léger + rotation shake gauche-droite + retour à 0° et scale normal
+            if (captured.value > 0 && photoValuePopupPrefab != null)
+            {
+                GameObject popup = Instantiate(photoValuePopupPrefab, photoPanel.transform);
+                RectTransform popupRT = popup.GetComponent<RectTransform>();
+                popupRT.anchoredPosition = rt.anchoredPosition;
+                popupRT.localScale = Vector3.one;
+
+                TextMeshProUGUI popupText = popup.GetComponent<TextMeshProUGUI>();
+                if (popupText != null)
+                    popupText.text = "+" + captured.value.ToString() + " $";
+
+                // Même animation que les cartes
+                Sequence popupAnim = DOTween.Sequence();
+                popupAnim.Append(popupRT.DOScale(1.35f, 0.15f).SetEase(Ease.OutBack));
+                popupAnim.Join(popupRT.DORotate(new Vector3(0f, 0f, startRot + 15f), 0.15f).SetEase(Ease.InOutSine));
+                popupAnim.Append(popupRT.DOScale(0.85f, 0.15f).SetEase(Ease.InOutSine));
+                popupAnim.Join(popupRT.DORotate(new Vector3(0f, 0f, startRot - 15f), 0.15f).SetEase(Ease.InOutSine));
+                popupAnim.Append(popupRT.DOScale(1f, 0.1f).SetEase(Ease.OutBack));
+                popupAnim.Join(popupRT.DORotate(new Vector3(0f, 0f, startRot), 0.1f).SetEase(Ease.OutBack));
+            
+                SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
+            }
+
+            float t = i / (float)(total - 1);
+            float speedMultiplier = Mathf.Lerp(1f, 0.2f, Mathf.Pow(t, 2f));
+
             Sequence s = DOTween.Sequence();
+            float zoomInTime = 0.15f * speedMultiplier;
+            float zoomOutTime = 0.15f * speedMultiplier;
+            float settleTime = 0.1f * speedMultiplier;
 
-            // Zoom in léger + rotation vers droite (shake)
-            s.Append(rt.DOScale(1.2f, 0.15f).SetEase(Ease.OutBack));
-            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot + 10f), 0.15f).SetEase(Ease.InOutSine));
+            SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.photoSlip);
 
-            // Zoom out + rotation vers gauche
-            s.Append(rt.DOScale(0.9f, 0.15f).SetEase(Ease.InOutSine));
-            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot - 10f), 0.15f).SetEase(Ease.InOutSine));
-
-            // Retour à scale 1 et rotation de départ (pose finale)
-            s.Append(rt.DOScale(1f, 0.1f).SetEase(Ease.OutBack));
-            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot), 0.1f).SetEase(Ease.OutBack));
+            s.Append(rt.DOScale(1.35f, zoomInTime).SetEase(Ease.OutBack));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot + 15f), zoomInTime).SetEase(Ease.InOutSine));
+            s.Append(rt.DOScale(0.85f, zoomOutTime).SetEase(Ease.InOutSine));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot - 15f), zoomOutTime).SetEase(Ease.InOutSine));
+            s.Append(rt.DOScale(1f, settleTime).SetEase(Ease.OutBack));
+            s.Join(rt.DORotate(new Vector3(0f, 0f, startRot), settleTime).SetEase(Ease.OutBack));
 
             yield return s.WaitForCompletion();
-
-            yield return new WaitForSeconds(0.2f); // court délai avant la photo suivante
+            float waitTime = Mathf.Lerp(0.15f, 0.02f, Mathf.Pow(i / (float)(total - 1), 1.5f));
+            yield return new WaitForSeconds(waitTime);
         }
+
+        int totalValue = GameManager.Instance.totalItemValue;
+
+        if (photoValuePopupPrefab != null)
+        {
+            GameObject totalPopup = Instantiate(finalValueText, photoPanel.transform);
+            RectTransform totalRT = totalPopup.GetComponent<RectTransform>();
+
+            // Centrage parfait
+            totalRT.anchorMin = new Vector2(0.5f, 0.5f);
+            totalRT.anchorMax = new Vector2(0.5f, 0.5f);
+            totalRT.pivot = new Vector2(0.5f, 0.5f);
+            totalRT.anchoredPosition = Vector2.zero;
+            totalRT.sizeDelta = new Vector2(1000f, 300f); 
+            totalRT.localScale = Vector3.one;
+
+            TextMeshProUGUI totalText = totalPopup.GetComponent<TextMeshProUGUI>();
+            if (totalText != null)
+            {
+                totalText.text = "Valeur totale : " + totalValue + " $";
+                totalText.fontSize = 400f; 
+                totalText.alignment = TextAlignmentOptions.Center; 
+
+                SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
+            }
+
+            float startRot = Random.Range(-10f, 10f);
+            Sequence totalAnim = DOTween.Sequence();
+            totalAnim.Append(totalRT.DOScale(1.6f, 0.2f).SetEase(Ease.OutBack)); 
+            totalAnim.Join(totalRT.DORotate(new Vector3(0f, 0f, startRot + 5f), 0.2f).SetEase(Ease.InOutSine));
+            totalAnim.Append(totalRT.DOScale(1.2f, 0.15f).SetEase(Ease.InOutSine));
+            totalAnim.Join(totalRT.DORotate(new Vector3(0f, 0f, startRot - 5f), 0.15f).SetEase(Ease.InOutSine));
+            totalAnim.Append(totalRT.DOScale(1f, 0.15f).SetEase(Ease.OutBack));
+            totalAnim.Join(totalRT.DORotate(new Vector3(0f, 0f, startRot), 0.15f).SetEase(Ease.OutBack));
+        }
+
+        SoundManager.Instance.StopBackgroundMusic();
+        SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.releaseEnGame);
 
         Debug.Log("Fin de la séquence des photos.");
     }
@@ -236,6 +326,16 @@ public class HandCamera : MonoBehaviour
         canTakePhoto = false;
         yield return new WaitForSeconds(photoCooldown);
         canTakePhoto = true;
+    }
+
+    private IEnumerator FlashOnlyCoroutine()
+    {
+        canFlashOnly = false;
+
+        yield return StartCoroutine(Flash(false));
+
+        yield return new WaitForSeconds(flashOnlyCooldown);
+        canFlashOnly = true;
     }
 
     IEnumerator Flash(bool isViolet)

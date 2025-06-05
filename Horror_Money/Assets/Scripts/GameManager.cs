@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("Item Collection")]
-    [SerializeField] private int totalItemValue = 0;
+    public int totalItemValue = 0;
 
     [SerializeField] private int goalValue;
     [SerializeField] private int minGoalValue = 200;

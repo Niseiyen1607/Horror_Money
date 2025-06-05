@@ -44,10 +44,6 @@ public class StealthEnemy : MonoBehaviour
     private float stunTimer = 0f;
     public float stunDuration = 5f;
 
-    private float timeSinceLastSeen = 0f;
-    [SerializeField] private float scareSoundDelay = 20f;
-    private bool scareSoundPlayed = false;
-
     public enum EnemyPhase { Phase1, Phase2 }
     public EnemyPhase currentPhase = EnemyPhase.Phase1;
 
