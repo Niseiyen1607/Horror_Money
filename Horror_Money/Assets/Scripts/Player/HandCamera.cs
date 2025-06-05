@@ -1,4 +1,6 @@
+using DG.Tweening;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,6 +48,8 @@ public class HandCamera : MonoBehaviour
     private int currentVioletFlash = 0;
 
     [SerializeField] PlayerHealth playerHealth;
+
+    public List<Texture2D> capturedPhotos = new List<Texture2D>();
 
     void Start()
     {
@@ -112,6 +116,13 @@ public class HandCamera : MonoBehaviour
         photoCamera.Render();
         photoDisplay.texture = renderTexture;
 
+        Texture2D photo = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        RenderTexture.active = renderTexture;
+        photo.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        photo.Apply();
+        RenderTexture.active = null;
+        capturedPhotos.Add(photo); 
+
         SoundManager.Instance.PlayFlash(transform.position);
 
         if (isViolet)
@@ -152,6 +163,52 @@ public class HandCamera : MonoBehaviour
             }
         }
     }
+
+    public void ShowEndPhotos()
+    {
+        StartCoroutine(PlayEndPhotoSequence());
+    }
+
+    private IEnumerator PlayEndPhotoSequence()
+    {
+        Camera.main.transform.DOShakePosition(1f, 0.5f, 10, 90f);
+        yield return new WaitForSeconds(0.5f);
+
+        GameObject photoPanel = new GameObject("PhotoPanel");
+        Canvas canvas = photoPanel.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        photoPanel.AddComponent<CanvasScaler>();
+        photoPanel.AddComponent<GraphicRaycaster>();
+
+        for (int i = 0; i < capturedPhotos.Count; i++)
+        {
+            GameObject photoGO = new GameObject("Photo_" + i);
+            photoGO.transform.SetParent(photoPanel.transform);
+
+            RawImage photoImage = photoGO.AddComponent<RawImage>();
+            photoImage.texture = capturedPhotos[i];
+            photoImage.color = new Color(1, 1, 1, 0);
+
+            RectTransform rt = photoGO.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(500, 300);
+            rt.anchoredPosition = Vector2.zero;
+            rt.localScale = Vector3.one;
+
+            // Set base rotation Y = 90 to simulate card back, then rotate to 0 (reveal)
+            rt.localEulerAngles = new Vector3(0f, 90f, 0f);
+
+            Sequence s = DOTween.Sequence();
+            s.Append(photoImage.DOFade(1f, 0.2f));
+            s.Join(rt.DOScale(1.2f, 0.3f).SetEase(Ease.OutBack)); // zoom effect
+            s.Join(rt.DORotate(Vector3.zero, 0.5f, RotateMode.Fast).SetEase(Ease.OutCubic)); // card flip
+
+            yield return s.WaitForCompletion(); // wait for this photo to finish
+            yield return new WaitForSeconds(0.7f); // delay before next photo
+        }
+
+        Debug.Log("Fin de la séquence des photos.");
+    }
+
 
     IEnumerator PhotoCooldown()
     {

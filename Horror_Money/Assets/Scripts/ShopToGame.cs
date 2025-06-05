@@ -9,14 +9,7 @@ public class ShopToGame : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if(SceneManager.GetActiveScene().name == "Shop")
-            {
-                StartCoroutine(LoadGameMainScene(1f)); 
-            }
-            if(SceneManager.GetActiveScene().name == "MainScene")
-            {
-                StartCoroutine(LoadGameShopScene(0f)); 
-            }
+            StartCoroutine(LoadGameMainScene(1f));
         }
     }
 
@@ -25,12 +18,5 @@ public class ShopToGame : MonoBehaviour
         LoadingManager.Instance.ShowLoadingScreen();
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene("MainScene");
-    }
-
-    private IEnumerator LoadGameShopScene(float delay)
-    {
-        LoadingManager.Instance.ShowLoadingScreen();
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("Shop");
     }
 }

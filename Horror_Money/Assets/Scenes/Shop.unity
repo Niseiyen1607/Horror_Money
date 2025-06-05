@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 53262618}
   - component: {fileID: 53262617}
   - component: {fileID: 53262616}
-  - component: {fileID: 53262615}
+  - component: {fileID: 53262619}
   m_Layer: 0
   m_Name: ChangeZone
   m_TagString: Untagged
@@ -180,18 +180,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &53262615
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 53262614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d200b10a251cfb74a9dd80add73b45ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &53262616
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -236,6 +224,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &53262619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 53262614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d200b10a251cfb74a9dd80add73b45ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &67735677
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +648,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 0.30971843, g: 0.6132076, b: 0, a: 1}
   m_Intensity: 22.09
-  m_Range: 10.22
+  m_Range: 18.75
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -766,7 +766,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 0.30971843, g: 0.6132076, b: 0, a: 1}
   m_Intensity: 22.09
-  m_Range: 10.22
+  m_Range: 18.75
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 0 / 0 $
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 855c002f8af4e174db6c7e9a786d6321, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 408fae75ef7f1d54d8b35abff5c35c57, type: 2}
@@ -3575,7 +3575,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 0.30971843, g: 0.6132076, b: 0, a: 1}
   m_Intensity: 22.09
-  m_Range: 10.22
+  m_Range: 18.75
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -5444,6 +5444,7 @@ MonoBehaviour:
   violetFlashCount: 10
   normalFlashCount: 10
   playerHealth: {fileID: 1389713226}
+  capturedPhotos: []
 --- !u!65 &1646678221
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6679,7 +6680,7 @@ MonoBehaviour:
   bloodOverlay: {fileID: 1159650496}
   gameOverText: {fileID: 1056406920}
   dustOverlay: {fileID: 1666141177}
-  goalText: {fileID: 0}
+  goalText: {fileID: 512841381}
   itemValuePopupPrefab: {fileID: 5186535127258146562, guid: 89300c86fc5d10845a6584fe8357aeb2, type: 3}
   itemPopupContainer: {fileID: 109858525}
   normalPhotoText: {fileID: 1703551984}
