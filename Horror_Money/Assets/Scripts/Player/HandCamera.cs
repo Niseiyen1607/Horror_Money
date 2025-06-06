@@ -206,7 +206,10 @@ public class HandCamera : MonoBehaviour
     public void IncreasePhoto(int amount)
     {
         maxPhotoCount += amount;
-        normalFlashCount += amount; 
+        normalFlashCount += amount;
+        UIManager.Instance.UpdatePhotoCounters(
+           normalFlashCount - currentNormalFlash,
+           violetFlashCount - currentVioletFlash);
         Debug.Log("Limite photos augmentée à " + maxPhotoCount);
     }
 
@@ -214,6 +217,9 @@ public class HandCamera : MonoBehaviour
     {
         maxPhotoCount += amount;
         violetFlashCount += amount;
+        UIManager.Instance.UpdatePhotoCounters(
+                   normalFlashCount - currentNormalFlash,
+                   violetFlashCount - currentVioletFlash);
         Debug.Log("Limite flash violets augmentée à " + violetFlashCount);
     }
 
@@ -346,6 +352,8 @@ public class HandCamera : MonoBehaviour
         Destroy(photoPanel);
 
         Debug.Log("Fin de la séquence des photos.");
+
+        IsphotoSlide = false;
     }
 
     IEnumerator PhotoCooldown()

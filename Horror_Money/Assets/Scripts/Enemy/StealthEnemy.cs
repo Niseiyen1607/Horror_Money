@@ -7,25 +7,25 @@ public class StealthEnemy : MonoBehaviour
     private Transform player;
     private Camera playerCamera;
     private NavMeshAgent agent;
-
-    [Header("Detection Settings")]
-    public float visionCheckInterval = 0.1f;
-    public LayerMask obstacleMask;
-
-    [Header("Audio")]
-    private float enemyFootstepTimer = 0f;
-    [SerializeField] private float footstepInterval = 0.2f;
-    [SerializeField] private float distanceMaxVolume = 50f;
-    [SerializeField] private float distancePhase2Scream = 50f;
+    [SerializeField] private Animator enemyAnimator;
+    private PlayerHealth playerHealth;
 
     [Header("Movement Settings")]
     public float idleSpeed = 0f;
     public float sneakSpeed = 5f;
     public float chaseSpeed = 10f;
     public float phase2ChaseSpeed = 50f;
-    public float postGoalChaseSpeed = 70f; 
-
+    public float postGoalChaseSpeed = 70f;
     private float currentSpeed = 0f;
+    private bool isPhase2Transitioning = false;
+
+    [Header("Detection Settings")]
+    public float visionCheckInterval = 0.1f;
+    public LayerMask obstacleMask;
+    private float noClearViewTimer = 0f;
+    private float timeBeforeJumpscare = 5f;
+    private bool hadNoClearViewLongEnough = false;
+    private bool hadClearViewLastFrame = false;
 
     [Header("Teleport Settings")]
     public float teleportMinDistance = 20f;
@@ -35,17 +35,22 @@ public class StealthEnemy : MonoBehaviour
     public float attackRange = 2.5f;
     public float damageInterval = 0.3f;
     public int damageAmount = 90;
-
     private float damageTimer = 0f;
-    private PlayerHealth playerHealth;
 
     [Header("Stun Settings")]
+    public float stunDuration = 5f;
     private bool isStunned = false;
     private float stunTimer = 0f;
-    public float stunDuration = 5f;
+
+    [Header("Audio")]
+    [SerializeField] private float footstepInterval = 0.2f;
+    [SerializeField] private float distanceMaxVolume = 50f;
+    [SerializeField] private float distancePhase2Scream = 50f;
+    private float enemyFootstepTimer = 0f;
 
     public enum EnemyPhase { Phase1, Phase2 }
     public EnemyPhase currentPhase = EnemyPhase.Phase1;
+
 
     void Start()
     {
@@ -59,10 +64,19 @@ public class StealthEnemy : MonoBehaviour
 
     void Update()
     {
+        if (isPhase2Transitioning)
+        {
+            agent.isStopped = true;
+            enemyAnimator.SetBool("isWalking", false);
+            return;
+        }
+
         if (isStunned)
         {
             stunTimer -= Time.deltaTime;
             agent.isStopped = true;
+
+            enemyAnimator.SetBool("isWalking", false);
 
             if (stunTimer <= 0f)
             {
@@ -80,6 +94,8 @@ public class StealthEnemy : MonoBehaviour
         }
 
         agent.speed = currentSpeed;
+
+        enemyAnimator.SetBool("isWalking", currentSpeed > 0f);
 
         if (currentSpeed > 0f)
         {
@@ -107,6 +123,8 @@ public class StealthEnemy : MonoBehaviour
             agent.SetDestination(transform.position);
         }
 
+
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (distanceToPlayer <= attackRange && currentSpeed > 0f)
@@ -117,6 +135,9 @@ public class StealthEnemy : MonoBehaviour
             if (damageTimer >= damageInterval)
             {
                 damageTimer = 0f;
+
+                enemyAnimator.SetTrigger("Attack");
+
                 playerHealth.TakeDamage(damageAmount);
                 CameraShake.Instance.Shake(0.3f, 0.2f);
 
@@ -151,8 +172,31 @@ public class StealthEnemy : MonoBehaviour
                               viewportPoint.y > 0 && viewportPoint.y < 1;
 
         bool hasLineOfSight = !Physics.Linecast(player.position, transform.position, obstacleMask);
+        bool hasClearView = isInCameraView && hasLineOfSight;
 
-        if (isInCameraView && hasLineOfSight)
+        if (!hasClearView)
+        {
+            noClearViewTimer += visionCheckInterval;
+
+            if (noClearViewTimer >= timeBeforeJumpscare)
+            {
+                hadNoClearViewLongEnough = true;
+            }
+        }
+        else
+        {
+            if (hadNoClearViewLongEnough && !hadClearViewLastFrame)
+            {
+                SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.stealthJumpscareSounds);
+            }
+
+            noClearViewTimer = 0f;
+            hadNoClearViewLongEnough = false;
+        }
+
+        hadClearViewLastFrame = hasClearView;
+
+        if (hasClearView)
             currentSpeed = idleSpeed;
         else if (hasLineOfSight)
             currentSpeed = chaseSpeed;
@@ -207,9 +251,8 @@ public class StealthEnemy : MonoBehaviour
         if (GameManager.Instance.isPostGoalPhase)
         {
             currentPhase = EnemyPhase.Phase2;
-            currentSpeed = postGoalChaseSpeed;
+            currentSpeed = sneakSpeed;
             agent.speed = currentSpeed;
-            SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
         }
         else if (GameManager.Instance.isInPhase2)
         {
@@ -220,18 +263,37 @@ public class StealthEnemy : MonoBehaviour
             SwitchToPhase1();
         }
     }
+
     private void SwitchToPhase2()
     {
         currentPhase = EnemyPhase.Phase2;
-        currentSpeed = phase2ChaseSpeed;
-        agent.speed = currentSpeed;
+
         SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
+
+        isPhase2Transitioning = true;
+        agent.isStopped = true;
+        currentSpeed = 0f;
+        enemyAnimator.SetBool("isWalking", false);
+
+        enemyAnimator.SetTrigger("EnterPhase2");
+
+        Invoke(nameof(OnPhase2TransitionComplete), 2f);
     }
+
+
     private void SwitchToPhase1()
     {
         currentPhase = EnemyPhase.Phase1;
         currentSpeed = sneakSpeed;
         agent.speed = currentSpeed;
+    }
+
+    public void OnPhase2TransitionComplete()
+    {
+        isPhase2Transitioning = false;
+        currentSpeed = phase2ChaseSpeed;
+        agent.speed = currentSpeed;
+        agent.isStopped = false;
     }
     #endregion
 

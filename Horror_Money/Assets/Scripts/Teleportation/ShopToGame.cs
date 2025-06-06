@@ -17,6 +17,7 @@ public class ShopToGame : MonoBehaviour
     {
         LoadingManager.Instance.ShowLoadingScreen();
         yield return new WaitForSeconds(delay);
+        GameManager.Instance.InitGoalValue();
         SceneManager.LoadScene("MainScene");
     }
 }

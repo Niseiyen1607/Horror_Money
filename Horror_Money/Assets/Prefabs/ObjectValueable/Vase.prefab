@@ -143,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Vase
   minValue: 0
-  maxValue: 100
+  maxValue: 75
   normalPickupParticles: {fileID: 1372773675875597018, guid: 7b6ae7204f6d0ad46b2206349f4483cf, type: 3}
   emptyPickupParticles: {fileID: 5700121789260551710, guid: 620449be9fbf08d448ea11664543980a, type: 3}
 --- !u!114 &8483463113487982365

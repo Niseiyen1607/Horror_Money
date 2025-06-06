@@ -25,18 +25,6 @@ public class LoadingManager : MonoBehaviour
     private void Start()
     {
         HideLoadingScreen();
-        GameObject playerSpawnPoint = GameObject.FindGameObjectWithTag("PlayerSpawnPoint");
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (playerSpawnPoint != null && player != null)
-        {
-            player.transform.position = playerSpawnPoint.transform.position;
-            player.transform.rotation = playerSpawnPoint.transform.rotation;
-        }
-        else
-        {
-            Debug.LogWarning("Player or PlayerSpawnPoint not found in the scene.");
-        }
     }
 
     public void ShowLoadingScreen()

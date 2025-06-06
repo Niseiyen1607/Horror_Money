@@ -53,6 +53,11 @@ public class UIManager : MonoBehaviour
             goalText.text = $"${currentValue} / ${goal}";
     }
 
+    public void UpdateTotalCoinsText(int total)
+    {
+        goalText.text = $"Total : {total}$";
+    }
+
     public void UpdatePhotoCounters(int normalLeft, int violetLeft)
     {
         if (normalPhotoText != null)

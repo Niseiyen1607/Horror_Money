@@ -71,6 +71,6 @@ public class PlayerHealth : MonoBehaviour
     private void ReloadCurrentScene()
     {
         UIManager.Instance.HideGameOverScreen();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("Shop");
     }
 }

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1015693461719139375}
   m_Layer: 0
   m_Name: PhotoObjectValue
-  m_TagString: photo-valeurs
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -62,14 +62,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: de62cd646ecbf994b810747e90bb9e8e, type: 2}
-  - {fileID: 2100000, guid: fff21aa838779404383aaf8fb5b5a3ba, type: 2}
+  - {fileID: 2100000, guid: 8349dd832ba25fb42982bc35d924acca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -163,6 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c00dc2ca5253bb24eb4a6876ae5479eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  basePhotoValue: 50
+  minPhotoValue: 30
+  maxPhotoValue: 80
   valueDecayFactor: 0.7
   photoCount: 0

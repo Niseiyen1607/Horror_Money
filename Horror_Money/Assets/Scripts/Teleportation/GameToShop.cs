@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 public class GameToShop : MonoBehaviour
@@ -21,13 +22,17 @@ public class GameToShop : MonoBehaviour
 
     private IEnumerator LoadShopScene(float delay)
     {
-        Destroy(enemy);
+        if (enemy != null)
+        {
+            enemy.GetComponent<StealthEnemy>().enabled = false;
+            enemy.GetComponent<NavMeshAgent>().enabled = false;
+        }
         LoadingManager.Instance.ShowLoadingScreen();
         HandCamera handCamera = FindObjectOfType<HandCamera>();
         if (handCamera != null)
         {
             handCamera.ShowEndPhotos();
-            yield return new WaitForSeconds(3f + handCamera.capturedPhotos.Count * 1.5f);
+            yield return new WaitForSeconds(handCamera.capturedPhotos.Count);
         }
 
         LoadingManager.Instance.ShowLoadingScreen();

@@ -8,6 +8,8 @@ public class ShopItem : MonoBehaviour, IInteractable
 
     private bool purchased = false;
 
+    [SerializeField] private GameObject upgradeEffect; 
+
     public void Interact()
     {
         if (purchased)
@@ -16,21 +18,24 @@ public class ShopItem : MonoBehaviour, IInteractable
             return;
         }
 
-        if (GameManager.Instance.totalItemValue >= cost)
+        if (GameManager.Instance.SpendCoins(cost))
         {
-            GameManager.Instance.AddItemValue(-cost);
-
             ApplyUpgrade();
 
-            purchased = true;
+            if (upgradeType != UpgradeType.MorePhotos && upgradeType != UpgradeType.MoreBlueLight)
+                purchased = true;
 
+            Instantiate(upgradeEffect, transform.position, Quaternion.identity);
             Debug.Log("Amélioration achetée : " + upgradeType);
+
+            SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.pickUp);
         }
         else
         {
             Debug.Log("Pas assez d'argent pour acheter cette amélioration !");
         }
     }
+
 
     private void ApplyUpgrade()
     {
@@ -40,14 +45,14 @@ public class ShopItem : MonoBehaviour, IInteractable
                 HandCamera handCamera = FindObjectOfType<HandCamera>();
                 if (handCamera != null)
                 {
-                    handCamera.IncreasePhoto(1); 
+                    handCamera.IncreasePhoto(10); 
                 }
                 break;
             case UpgradeType.MoreBlueLight:
                 HandCamera handCameraBlueLight = FindObjectOfType<HandCamera>();
                 if (handCameraBlueLight != null)
                 {
-                    handCameraBlueLight.IncreaseBlueLight(1); 
+                    handCameraBlueLight.IncreaseBlueLight(5); 
                 }
                 break;
         }
