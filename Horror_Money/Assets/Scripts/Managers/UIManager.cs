@@ -61,9 +61,9 @@ public class UIManager : MonoBehaviour
     public void UpdatePhotoCounters(int normalLeft, int violetLeft)
     {
         if (normalPhotoText != null)
-            normalPhotoText.text = $"Photos : {normalLeft}";
+            normalPhotoText.text = $"Photos filter : {normalLeft}";
         if (violetPhotoText != null)
-            violetPhotoText.text = $"Filtre bleu : {violetLeft}";
+            violetPhotoText.text = $"Violet filter: {violetLeft}";
     }
 
     public void FadeOutDust(float duration = 1f)

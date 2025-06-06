@@ -22,6 +22,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip phase2Enemy;
     public AudioClip enemyFlashStun;
     public AudioClip stealthJumpscareSounds;
+    public AudioClip[] playerLandingClips;
 
     [Header("Background Music")]
     public AudioClip[] photoSlip;

@@ -75,6 +75,11 @@ public class FirstPersonController : MonoBehaviour
         wasGrounded = isGrounded;
         isGrounded = controller.isGrounded;
 
+        if (!wasGrounded && isGrounded)
+        {
+            SoundManager.Instance.PlayRandomGlobalSFX(SoundManager.Instance.playerLandingClips);
+        }
+
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;

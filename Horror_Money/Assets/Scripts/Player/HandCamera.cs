@@ -325,7 +325,7 @@ public class HandCamera : MonoBehaviour
             TextMeshProUGUI totalText = totalPopup.GetComponent<TextMeshProUGUI>();
             if (totalText != null)
             {
-                totalText.text = "Valeur totale : " + totalValue + " $";
+                totalText.text = "Total Value : " + totalValue + " $";
                 totalText.fontSize = 400f; 
                 totalText.alignment = TextAlignmentOptions.Center; 
 

@@ -23,7 +23,7 @@ public class StealthEnemy : MonoBehaviour
     public float visionCheckInterval = 0.1f;
     public LayerMask obstacleMask;
     private float noClearViewTimer = 0f;
-    private float timeBeforeJumpscare = 5f;
+    private float timeBeforeJumpscare = 20f;
     private bool hadNoClearViewLongEnough = false;
     private bool hadClearViewLastFrame = false;
 
@@ -41,6 +41,14 @@ public class StealthEnemy : MonoBehaviour
     public float stunDuration = 5f;
     private bool isStunned = false;
     private float stunTimer = 0f;
+    private int flashCount = 0;      
+    [SerializeField] private int maxFlashCount = 3; 
+
+
+    [Header("Eye Settings")]
+    [SerializeField] private Renderer[] eyeRenderers; 
+    [SerializeField] private Color phase1EmissionColor = Color.white;
+    [SerializeField] private Color phase2EmissionColor = Color.red;
 
     [Header("Audio")]
     [SerializeField] private float footstepInterval = 0.2f;
@@ -60,6 +68,8 @@ public class StealthEnemy : MonoBehaviour
         InvokeRepeating(nameof(CheckVisibilityAndLineOfSight), 0f, visionCheckInterval);
         playerHealth = player.GetComponent<PlayerHealth>();
         GameManager.Instance.OnPhaseChanged += HandlePhaseChange;
+
+        UpdateEyeEmission();
     }
 
     void Update()
@@ -208,6 +218,8 @@ public class StealthEnemy : MonoBehaviour
     {
         if (currentPhase == EnemyPhase.Phase2)
         {
+            flashCount++;  
+
             bool positionFound = false;
             NavMeshHit hit = new NavMeshHit();
 
@@ -235,15 +247,22 @@ public class StealthEnemy : MonoBehaviour
             stunTimer = stunTime;
             agent.isStopped = true;
             SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
+
+            if (flashCount >= maxFlashCount)
+            {
+                flashCount = 0;
+                SwitchToPhase1();
+            }
         }
         else if (currentPhase == EnemyPhase.Phase1)
         {
             isStunned = true;
-            stunTimer = stunTime * 0.5f;
+            stunTimer = stunTime * 1.2f;
             agent.isStopped = true;
             SoundManager.Instance.PlayGlobalOneShot(SoundManager.Instance.enemyFlashStun);
         }
     }
+
 
     #region Enemy Phase Handling
     private void HandlePhaseChange()
@@ -268,6 +287,9 @@ public class StealthEnemy : MonoBehaviour
     {
         currentPhase = EnemyPhase.Phase2;
 
+        flashCount = 0; 
+
+        UpdateEyeEmission();
         SoundManager.Instance.PlayPhase2Enemy(transform.position, distancePhase2Scream);
 
         isPhase2Transitioning = true;
@@ -286,6 +308,7 @@ public class StealthEnemy : MonoBehaviour
         currentPhase = EnemyPhase.Phase1;
         currentSpeed = sneakSpeed;
         agent.speed = currentSpeed;
+        UpdateEyeEmission();
     }
 
     public void OnPhase2TransitionComplete()
@@ -295,6 +318,30 @@ public class StealthEnemy : MonoBehaviour
         agent.speed = currentSpeed;
         agent.isStopped = false;
     }
+
+    private void SetEyeEmission(Color color)
+    {
+        foreach (var renderer in eyeRenderers)
+        {
+            if (renderer == null) continue;
+
+            MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(mpb);
+
+            mpb.SetColor("_EmissionColor", color);
+
+            renderer.SetPropertyBlock(mpb);
+        }
+    }
+
+    private void UpdateEyeEmission()
+    {
+        if (currentPhase == EnemyPhase.Phase2)
+            SetEyeEmission(phase2EmissionColor);
+        else
+            SetEyeEmission(phase1EmissionColor);
+    }
+
     #endregion
 
     void OnDrawGizmosSelected()
