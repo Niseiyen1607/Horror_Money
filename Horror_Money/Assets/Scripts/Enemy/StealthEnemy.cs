@@ -44,7 +44,6 @@ public class StealthEnemy : MonoBehaviour
     private int flashCount = 0;      
     [SerializeField] private int maxFlashCount = 3; 
 
-
     [Header("Eye Settings")]
     [SerializeField] private Renderer[] eyeRenderers; 
     [SerializeField] private Color phase1EmissionColor = Color.white;
@@ -63,6 +62,13 @@ public class StealthEnemy : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        if (player == null)
+        {
+            Debug.LogError("StealthEnemy: Aucun joueur trouvé dans la scène.");
+            enabled = false;
+            return;
+        }
         playerCamera = Camera.main;
         agent = GetComponent<NavMeshAgent>();
         InvokeRepeating(nameof(CheckVisibilityAndLineOfSight), 0f, visionCheckInterval);
